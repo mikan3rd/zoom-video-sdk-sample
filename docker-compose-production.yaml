@@ -9,14 +9,15 @@ services:
   typescript:
     build:
       context: .
-      dockerfile: ./typescript/Dockerfile.dev
+      dockerfile: ./typescript/Dockerfile
+      args:
+        <<: *env
     environment:
       <<: *env
     tty: true
     ports:
       - "3000:3000"
     volumes:
-      - ${HOME}/.gitconfig:/root/.gitconfig
       - .:/app
       - /typescript/node_modules
       - /typescript/.next

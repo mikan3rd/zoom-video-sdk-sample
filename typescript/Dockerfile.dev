@@ -1,10 +1,12 @@
 FROM node:18-alpine
 
-WORKDIR /app/typescript
+WORKDIR /app
 
 RUN apk update && apk add --no-cache git
 
-COPY . .
+COPY ./typescript ./typescript
+
+WORKDIR /app/typescript
 
 RUN yarn install
 
