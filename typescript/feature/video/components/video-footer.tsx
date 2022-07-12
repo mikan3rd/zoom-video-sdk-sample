@@ -118,7 +118,7 @@ const VideoFooter = (props: VideoFooterProps) => {
       setIsStartedScreenShare(false);
     }
   }, [mediaStream, isStartedScreenShare, shareRef]);
-  const onPassivelyStopShare = useCallback(({ reason }: Parameters<typeof event_passively_stop_share>[0]) => {
+  const onPassivelyStopShare = useCallback((reason: Parameters<typeof event_passively_stop_share>[0]) => {
     console.log('passively stop reason:', reason);
     setIsStartedScreenShare(false);
   }, []);

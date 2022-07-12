@@ -2,6 +2,7 @@
 import React from 'react';
 import './home.scss';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 
 import Background from 'images/background.png'
@@ -54,11 +55,13 @@ return (
 
       >
       <div className="topnav">
-        <a href="/" className="" id="logo">
+        <Link href="/">
+        <a  className="" id="logo">
 
-            <img className="Logo-Img" src={Header} alt="Header"/>
+            <img className="Logo-Img" src={Header.src} alt="Header"/>
 
         </a>
+        </Link>
         <div className="links">
 
         </div>
@@ -66,7 +69,7 @@ return (
 
       <div className="Home-Content-Container">
 
-        <img id="logo" src={App_Img} />
+        <img id="logo" src={App_Img.src} alt="App_Img" />
 
         <div className="home">
           <h1>My Video SDK Project</h1>
@@ -78,7 +81,7 @@ return (
             const { key, icon, title } = feature;
 
               return (
-                <div>
+                <div key={key}>
                   <button
                     onClick={() => onCardClick(key)}
 
