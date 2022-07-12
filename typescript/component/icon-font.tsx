@@ -1,17 +1,17 @@
 import React from 'react';
 import Icon from '@ant-design/icons';
-import { ReactComponent as IconAdvanced } from './svgs/icon-advanced.svg';
-import { ReactComponent as IconChat } from './svgs/icon-chat.svg';
-import { ReactComponent as IconGroup } from './svgs/icon-group.svg';
-import { ReactComponent as IconHeadset } from './svgs/icon-headset.svg';
-import { ReactComponent as IconMeeting } from './svgs/icon-meeting.svg';
-import { ReactComponent as IconPause } from './svgs/icon-pause.svg';
-import { ReactComponent as IconRemoteControl } from './svgs/icon-remote-control.svg';
-import { ReactComponent as IconResume } from './svgs/icon-resume.svg';
-import { ReactComponent as IconShare } from './svgs/icon-share.svg';
-import { ReactComponent as IconSpotlight } from './svgs/icon-spotlight.svg';
-import { ReactComponent as IconStart } from './svgs/icon-start.svg';
-import { ReactComponent as IconStop } from './svgs/icon-stop.svg';
+import IconAdvanced from './svgs/icon-advanced.svg';
+import IconChat from './svgs/icon-chat.svg';
+import IconGroup from './svgs/icon-group.svg';
+import IconHeadset from './svgs/icon-headset.svg';
+import IconMeeting from './svgs/icon-meeting.svg';
+import IconPause from './svgs/icon-pause.svg';
+import IconRemoteControl from './svgs/icon-remote-control.svg';
+import IconResume from './svgs/icon-resume.svg';
+import IconShare from './svgs/icon-share.svg';
+import IconSpotlight from './svgs/icon-spotlight.svg';
+import IconStart from './svgs/icon-start.svg';
+import IconStop from './svgs/icon-stop.svg';
 const iconComponentMap: { [key: string]: any } = {
   'icon-advanced': IconAdvanced,
   'icon-chat': IconChat,
