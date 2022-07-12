@@ -14,6 +14,8 @@ import { ScreenShareButton } from './screen-share';
 import ZoomMediaContext from '../../../context/media-context';
 import { useUnmount } from '../../../hooks';
 import { MediaDevice } from '../video-types';
+import { event_passively_stop_share,  event_current_audio_change} from "@zoom/videosdk"
+
 import './video-footer.scss';
 interface VideoFooterProps {
   className?: string;
@@ -78,7 +80,7 @@ const VideoFooter = (props: VideoFooterProps) => {
         await mediaStream.stopAudio();
         setIsStartedAudio(false);
       }
-      
+
     }
   };
   const onSwitchCamera = async (key: string) => {
@@ -89,7 +91,7 @@ const VideoFooter = (props: VideoFooterProps) => {
       }
     }
   };
-  const onHostAudioMuted = useCallback((payload) => {
+  const onHostAudioMuted = useCallback((payload: Parameters<typeof event_current_audio_change>[0]) => {
     const { action, source, type } = payload;
     if (action === 'join' && type === 'computer') {
       setIsStartedAudio(true);
@@ -116,7 +118,7 @@ const VideoFooter = (props: VideoFooterProps) => {
       setIsStartedScreenShare(false);
     }
   }, [mediaStream, isStartedScreenShare, shareRef]);
-  const onPassivelyStopShare = useCallback(({ reason }) => {
+  const onPassivelyStopShare = useCallback(({ reason }: Parameters<typeof event_passively_stop_share>[0]) => {
     console.log('passively stop reason:', reason);
     setIsStartedScreenShare(false);
   }, []);
@@ -153,23 +155,23 @@ const VideoFooter = (props: VideoFooterProps) => {
   });
   return (
     <div className={classNames('video-footer', className)}>
-      
+
         { isAudioEnable && (
       <MicrophoneButton
         isStartedAudio={isStartedAudio}
         isMuted={isMuted}
         onMicrophoneClick={onMicrophoneClick}
           onMicrophoneMenuClick={onMicrophoneMenuClick}
-          
+
         microphoneList={micList}
-      
+
       speakerList={speakerList}
       activeMicrophone={activeMicrophone}
       activeSpeaker={activeSpeaker}
         />
       )}
-      
-      
+
+
       <CameraButton
         isStartedVideo={isStartedVideo}
         onCameraClick={onCameraClick}
@@ -177,15 +179,15 @@ const VideoFooter = (props: VideoFooterProps) => {
         cameraList={cameraList}
         activeCamera={activeCamera}
       />
-      
-      
+
+
         { sharing && (
           <ScreenShareButton
             isStartedScreenShare={isStartedScreenShare}
             onScreenShareClick={onScreenShareClick}
           />
         )}
-      
+
       {/* {(zmClient.isManager() || zmClient.isHost())&& (
         <ScreenShareLockButton
         isLockedScreenShare={isLockedScreenShare}

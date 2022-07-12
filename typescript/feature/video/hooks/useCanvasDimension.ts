@@ -2,13 +2,17 @@ import _ from 'lodash';
 import { useState, useCallback, useEffect, MutableRefObject } from 'react';
 import { useSizeCallback, useMount } from '../../../hooks';
 import { MediaStream } from '../../../types/index-types';
+import {} from "@zoom/videosdk"
 export function useCanvasDimension(
   mediaStream: MediaStream | null,
   videoRef: MutableRefObject<HTMLCanvasElement | null>,
 ) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
   const onCanvasResize = useCallback(
-    ({ width, height }) => {
+    ({ width, height }: {
+    width: number;
+    height: number;
+}) => {
       if (videoRef) {
         _.debounce((...args) => {
           setDimension({

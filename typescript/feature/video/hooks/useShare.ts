@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, MutableRefObject } from 'react';
 import { useMount, usePrevious, useUnmount } from '../../../hooks';
 import { ZoomClient, MediaStream } from '../../../types/index-types';
+import {event_active_share_change, event_user_update} from "@zoom/videosdk"
+
 export function useShare(
   zmClient: ZoomClient,
   mediaStream: MediaStream | null,
@@ -15,7 +17,7 @@ export function useShare(
   });
   const [currentUserId, setCurrentUserId] = useState(0);
   const onActiveShareChange = useCallback(
-    ({ state, userId }) => {
+    ({ state, userId }: Parameters<typeof event_active_share_change>[0]) => {
       if (!isStartedShare) {
         setActiveSharingId(userId);
         setIsReceiveSharing(state === 'Active');
@@ -23,11 +25,14 @@ export function useShare(
     },
     [isStartedShare],
   );
-  const onSharedContentDimensionChange = useCallback(({ width, height }) => {
+  const onSharedContentDimensionChange = useCallback(({ width, height }: {
+    width: number;
+    height: number;
+}) => {
     setSharedContentDimension({ width, height });
   }, []);
   const onCurrentUserUpdate = useCallback(
-    (payload) => {
+    (payload: Parameters<typeof event_user_update>[0]) => {
       if (Array.isArray(payload) && payload.length > 0) {
         payload.forEach((item) => {
           if (item.userId === currentUserId && item.sharerOn !== undefined) {

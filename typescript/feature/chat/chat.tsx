@@ -72,7 +72,6 @@ const ChatContainer = () => {
     },
     [],
   );
-  type A = typeof event_chat_privilege_change;
   useEffect(() => {
     zmClient.on('chat-on-message', onChatMessage);
     return () => {

@@ -18,6 +18,7 @@ import { useCanvasDimension } from './hooks/useCanvasDimension';
 import { usePrevious, useMount } from '../../hooks';
 import { Participant } from '../../types/index-types';
 import './video.scss';
+import {event_audio_active_speaker, event_video_active_change} from "@zoom/videosdk"
 
 const VideoContainer: React.FunctionComponent = (props) => {
   const zmClient = useContext(ZoomContext);
@@ -54,7 +55,7 @@ const VideoContainer: React.FunctionComponent = (props) => {
   useParticipantsChange(zmClient, (payload) => {
     setParticipants(payload);
   });
-  const onActiveVideoChange = useCallback((payload) => {
+  const onActiveVideoChange = useCallback((payload: Parameters<typeof event_video_active_change>[0]) => {
     const { state, userId } = payload;
     if (state === VideoActiveState.Active) {
       setActiveVideo(userId);
@@ -62,7 +63,7 @@ const VideoContainer: React.FunctionComponent = (props) => {
       setActiveVideo(0);
     }
   }, []);
-  const onActiveSpeakerChange = useCallback((payload) => {
+  const onActiveSpeakerChange = useCallback((payload: Parameters<typeof event_audio_active_speaker>[0]) => {
     if (Array.isArray(payload) && payload.length > 0) {
       const { userId } = payload[0];
       setActiveSpeaker(userId);
