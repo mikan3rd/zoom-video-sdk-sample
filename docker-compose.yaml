@@ -1,0 +1,22 @@
+version: "3"
+
+x-env: &env
+  TZ: Asia/Tokyo
+  NEXT_PUBLIC_ZOOM_SDK_KEY: ""
+  NEXT_PUBLIC_ZOOM_SDK_SECRET: ""
+
+services:
+  typescript:
+    build:
+      context: .
+      dockerfile: ./typescript/Dockerfile.dev
+    environment:
+      <<: *env
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./typescript:/app/typescript
+      - /typescript/node_modules
+      - /typescript/.next
+      - /.git
