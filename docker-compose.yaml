@@ -16,7 +16,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - .git:/app/.git
+      - ${HOME}/.gitconfig:/root/.gitconfig
       - ./typescript:/app/typescript
       - /typescript/node_modules
       - /typescript/.next
-      - /.git
