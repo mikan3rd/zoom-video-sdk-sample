@@ -15,6 +15,7 @@ import { message, Modal } from "antd";
 import ZoomContext from "../context/zoom-context";
 import { ChatClient, MediaStream } from "../types/index-types";
 import produce from "immer";
+import "../styles/App.css";
 
 interface AppProps {
   meetingArgs: {
