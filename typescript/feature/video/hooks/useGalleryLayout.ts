@@ -1,6 +1,6 @@
 import { MutableRefObject, useCallback, useEffect, useState } from "react";
 
-import { MediaStream, Participant, ZoomClient } from "../../../index-types.d";
+import { MediaStream, Participant, ZoomClient } from "../../../types/index-types.d";
 import { getVideoLayout } from "../video-layout-helper";
 import { CellLayout, Dimension, Pagination } from "../video-types.d";
 

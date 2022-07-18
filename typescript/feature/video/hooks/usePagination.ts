@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useMount } from "../../../hooks";
-import { ZoomClient } from "../../../index-types.d";
+import { ZoomClient } from "../../../types/index-types.d";
 import { maxViewportVideoCounts } from "../video-layout-helper";
 import { Dimension } from "../video-types.d";
 

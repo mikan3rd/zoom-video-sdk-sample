@@ -3,7 +3,7 @@ import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import { event_active_share_change, event_share_content_dimension_change, event_user_update } from "@zoom/videosdk";
 
 import { useMount, usePrevious, useUnmount } from "../../../hooks";
-import { MediaStream, ZoomClient } from "../../../index-types.d";
+import { MediaStream, ZoomClient } from "../../../types/index-types.d";
 
 export function useShare(
   zmClient: ZoomClient,

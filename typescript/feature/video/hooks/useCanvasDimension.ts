@@ -3,7 +3,7 @@ import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import _ from "lodash";
 
 import { useMount, useSizeCallback } from "../../../hooks";
-import { MediaStream } from "../../../index-types.d";
+import { MediaStream } from "../../../types/index-types.d";
 export function useCanvasDimension(
   mediaStream: MediaStream | null,
   videoRef: MutableRefObject<HTMLCanvasElement | null>,

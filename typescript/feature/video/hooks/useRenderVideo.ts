@@ -1,7 +1,7 @@
 import { MutableRefObject, useEffect } from "react";
 
 import { usePersistFn, usePrevious } from "../../../hooks";
-import { MediaStream, Participant } from "../../../index-types.d";
+import { MediaStream, Participant } from "../../../types/index-types.d";
 import { isShallowEqual } from "../../../utils/util";
 import { CellLayout } from "../video-types.d";
 

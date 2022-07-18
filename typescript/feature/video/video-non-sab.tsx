@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from "rea
 
 import classnames from "classnames";
 import _ from "lodash";
-import { RouteComponentProps } from "react-router-dom";
 
 import ZoomMediaContext from "../../context/media-context";
 import ZoomContext from "../../context/zoom-context";
@@ -24,7 +23,7 @@ import "./video.scss";
 
 const isUseVideoElementToDrawSelfVideo = isAndroidBrowser() || isSupportOffscreenCanvas();
 
-const VideoContainer: React.FunctionComponent<RouteComponentProps> = (props) => {
+const VideoContainer: React.FunctionComponent = (props) => {
   const zmClient = useContext(ZoomContext);
   const {
     mediaStream,

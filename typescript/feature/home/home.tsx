@@ -1,19 +1,20 @@
 import { Button, Card } from "antd";
-import { RouteComponentProps } from "react-router-dom";
+import { useRouter } from "next/router";
 
 import { IconFont, IconType } from "../../component/icon-font";
 
 import "./home.scss";
 
 const { Meta } = Card;
-interface HomeProps extends RouteComponentProps {
+interface HomeProps {
   status: string;
   onLeaveOrJoinSession: () => void;
 }
 const Home: React.FunctionComponent<HomeProps> = (props) => {
-  const { history, status, onLeaveOrJoinSession } = props;
+  const router = useRouter();
+  const { status, onLeaveOrJoinSession } = props;
   const onCardClick = (type: string) => {
-    history.push(`/${type}${location.search}`);
+    router.push(`/${type}${location.search}`);
   };
   const featureList: {
     key: string;

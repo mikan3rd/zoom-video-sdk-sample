@@ -3,12 +3,11 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import { VideoQuality, event_video_active_change } from "@zoom/videosdk";
 import classnames from "classnames";
 import _ from "lodash";
-import { RouteComponentProps } from "react-router-dom";
 
 import ZoomMediaContext from "../../context/media-context";
 import ZoomContext from "../../context/zoom-context";
 import { useMount, useSizeCallback } from "../../hooks";
-import { Participant } from "../../index-types.d";
+import { Participant } from "../../types/index-types.d";
 import { isAndroidBrowser, isSupportOffscreenCanvas, isSupportWebCodecs } from "../../utils/platform";
 import { isShallowEqual } from "../../utils/util";
 
@@ -23,7 +22,7 @@ import "./video.scss";
 
 const isUseVideoElementToDrawSelfVideo = isAndroidBrowser() || isSupportOffscreenCanvas();
 
-const VideoContainer: React.FunctionComponent<RouteComponentProps> = (props) => {
+const VideoContainer: React.FunctionComponent = (props) => {
   const zmClient = useContext(ZoomContext);
   const {
     mediaStream,
