@@ -1,16 +1,18 @@
-import React, { useCallback, useContext, useEffect, useState, useRef } from 'react';
-import produce from 'immer';
-import { Input } from 'antd';
-import { ChatPrivilege, event_chat_privilege_change } from '@zoom/videosdk';
-import ZoomContext from '../../context/zoom-context';
-import { ChatReceiver, ChatRecord } from './chat-types';
-import { useParticipantsChange } from './hooks/useParticipantsChange';
-import ChatContext from '../../context/chat-context';
-import ChatMessageItem from './component/chat-message-item';
-import ChatReceiverContainer from './component/chat-receiver';
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
-import { useMount } from '../../hooks';
-import './chat.scss';
+import { ChatPrivilege, event_chat_privilege_change } from "@zoom/videosdk";
+import { Input } from "antd";
+import { produce } from "immer";
+
+import ChatContext from "../../context/chat-context";
+import ZoomContext from "../../context/zoom-context";
+import { useMount } from "../../hooks";
+
+import { ChatReceiver, ChatRecord } from "./chat-types.d";
+import ChatMessageItem from "./component/chat-message-item";
+import ChatReceiverContainer from "./component/chat-receiver";
+import { useParticipantsChange } from "./hooks/useParticipantsChange";
+
 const { TextArea } = Input;
 const ChatContainer = () => {
   const zmClient = useContext(ZoomContext);
@@ -18,13 +20,11 @@ const ChatContainer = () => {
   const [chatRecords, setChatRecords] = useState<ChatRecord[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number>(0);
   const [chatReceivers, setChatReceivers] = useState<ChatReceiver[]>([]);
-  const [chatPrivilege, setChatPrivilege] = useState<ChatPrivilege>(
-    ChatPrivilege.All,
-  );
+  const [chatPrivilege, setChatPrivilege] = useState<ChatPrivilege>(ChatPrivilege.All);
   const [chatUser, setChatUser] = useState<ChatReceiver | null>(null);
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [isManager, setIsManager] = useState<boolean>(false);
-  const [chatDraft, setChatDraft] = useState<string>('');
+  const [isManager] = useState<boolean>(false);
+  const [chatDraft, setChatDraft] = useState<string>("");
   const chatWrapRef = useRef<HTMLDivElement | null>(null);
   const onChatMessage = useCallback(
     (payload: ChatRecord) => {
@@ -34,7 +34,7 @@ const ChatContainer = () => {
           if (length > 0) {
             const lastRecord = records[length - 1];
             if (
-              payload.sender.userId === lastRecord.sender.userId &&
+              payload.sender.userId === lastRecord?.sender.userId &&
               payload.receiver.userId === lastRecord.receiver.userId &&
               payload.timestamp - lastRecord.timestamp < 1000 * 60 * 5
             ) {
@@ -51,7 +51,7 @@ const ChatContainer = () => {
           }
         }),
       );
-      if (chatWrapRef.current) {
+      if (chatWrapRef.current !== null) {
         chatWrapRef.current.scrollTo(0, chatWrapRef.current.scrollHeight);
       }
     },
@@ -60,47 +60,42 @@ const ChatContainer = () => {
   const onChatPrivilegeChange = useCallback(
     (payload: Parameters<typeof event_chat_privilege_change>[0]) => {
       setChatPrivilege(payload.chatPrivilege);
-      if (chatClient) {
+      if (chatClient !== null) {
         setChatReceivers(chatClient.getReceivers());
       }
     },
     [chatClient],
   );
-  const onChatInput = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setChatDraft(event.target.value);
-    },
-    [],
-  );
+  const onChatInput = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setChatDraft(event.target.value);
+  }, []);
   useEffect(() => {
-    zmClient.on('chat-on-message', onChatMessage);
+    zmClient.on("chat-on-message", onChatMessage);
     return () => {
-      zmClient.off('chat-on-message', onChatMessage);
+      zmClient.off("chat-on-message", onChatMessage);
     };
   }, [zmClient, onChatMessage]);
   useEffect(() => {
-    zmClient.on('chat-privilege-change', onChatPrivilegeChange);
+    zmClient.on("chat-privilege-change", onChatPrivilegeChange);
     return () => {
-      zmClient.off('chat-privilege-change', onChatPrivilegeChange);
+      zmClient.off("chat-privilege-change", onChatPrivilegeChange);
     };
   }, [zmClient, onChatPrivilegeChange]);
   useParticipantsChange(zmClient, () => {
-    if (chatClient) {
+    if (chatClient !== null) {
       setChatReceivers(chatClient.getReceivers());
     }
     setIsHost(zmClient.isHost());
-    setIsManager(zmClient.isManager());
+    // setIsManager(zmClient.isManager());
   });
   useEffect(() => {
-    if (chatUser) {
-      const index = chatReceivers.findIndex(
-        (user) => user.userId === chatUser.userId,
-      );
-      if (index === -1) {
+    if (chatUser !== null) {
+      const index = chatReceivers.findIndex((user) => user.userId === chatUser.userId);
+      if (index === -1 && chatReceivers[0] !== undefined) {
         setChatUser(chatReceivers[0]);
       }
     } else {
-      if (chatReceivers.length > 0) {
+      if (chatReceivers.length > 0 && chatReceivers[0] !== undefined) {
         setChatUser(chatReceivers[0]);
       }
     }
@@ -108,7 +103,7 @@ const ChatContainer = () => {
   const setChatUserId = useCallback(
     (userId: number) => {
       const user = chatReceivers.find((u) => u.userId === userId);
-      if (user) {
+      if (user !== undefined) {
         setChatUser(user);
       }
     },
@@ -117,23 +112,22 @@ const ChatContainer = () => {
   const sendMessage = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       event.preventDefault();
-      if (chatUser && chatDraft) {
-        chatClient?.send(chatDraft, chatUser?.userId);
-        setChatDraft('');
+      if (chatUser !== null) {
+        chatClient?.send(chatDraft, chatUser.userId);
+        setChatDraft("");
       }
     },
     [chatClient, chatDraft, chatUser],
   );
   useMount(() => {
     setCurrentUserId(zmClient.getSessionInfo().userId);
-    if (chatClient) {
+    if (chatClient !== null) {
       setChatPrivilege(chatClient.getPrivilege());
     }
   });
   return (
     <div className="chat-container">
       <div className="chat-wrap">
-        <a className="exit-chat" href="/"> <i className="far fa-times-circle"></i> </a>
         <h2>Chat</h2>
         <div className="chat-message-wrap" ref={chatWrapRef}>
           {chatRecords.map((record) => (

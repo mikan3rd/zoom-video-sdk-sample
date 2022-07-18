@@ -1,72 +1,224 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
-const Home: NextPage = () => {
+import ZoomVideo, {
+  ConnectionState,
+  event_connection_change,
+  event_dial_out_change,
+  event_media_sdk_change,
+} from "@zoom/videosdk";
+import { Modal, message } from "antd";
+import { produce } from "immer";
+import type { NextPage } from "next";
+
+import LoadingLayer from "../component/loading-layer";
+import ChatContext from "../context/chat-context";
+import CommandContext from "../context/cmd-context";
+import ZoomMediaContext from "../context/media-context";
+import RecordingContext from "../context/recording-context";
+import ZoomContext from "../context/zoom-context";
+import Chat from "../feature/chat/chat";
+import Command from "../feature/command/command";
+import Home from "../feature/home/home";
+import Preview from "../feature/preview/preview";
+import Video from "../feature/video/video";
+import VideoNonSAB from "../feature/video/video-non-sab";
+import VideoSingle from "../feature/video/video-single";
+import { ChatClient, CommandChannelClient, MediaStream, RecordingClient } from "../types/index-types.d";
+import { isAndroidBrowser } from "../utils/platform";
+
+type AppProps = {
+  topic: string;
+  signature: string;
+  name: string;
+  password?: string;
+  enforceGalleryView?: boolean;
+};
+
+const mediaShape = {
+  audio: {
+    encode: false,
+    decode: false,
+  },
+  video: {
+    encode: false,
+    decode: false,
+  },
+  share: {
+    encode: false,
+    decode: false,
+  },
+};
+
+const mediaReducer = produce((draft, action) => {
+  switch (action.type) {
+    case "audio-encode": {
+      draft.audio.encode = action.payload;
+      break;
+    }
+    case "audio-decode": {
+      draft.audio.decode = action.payload;
+      break;
+    }
+    case "video-encode": {
+      draft.video.encode = action.payload;
+      break;
+    }
+    case "video-decode": {
+      draft.video.decode = action.payload;
+      break;
+    }
+    case "share-encode": {
+      draft.share.encode = action.payload;
+      break;
+    }
+    case "share-decode": {
+      draft.share.decode = action.payload;
+      break;
+    }
+    case "reset-media": {
+      Object.assign(draft, { ...mediaShape });
+      break;
+    }
+
+    default:
+      break;
+  }
+}, mediaShape);
+
+const Index: NextPage<AppProps> = (props) => {
+  const { topic, signature, name, password, enforceGalleryView } = props;
+
+  const [selectedCard, setSelectedCard] = useState<string>("home");
+  const [loading, setIsLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState("");
+  const [isFailover, setIsFailover] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>("closed");
+  const [mediaState, dispatch] = useReducer(mediaReducer, mediaShape);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [chatClient, setChatClient] = useState<ChatClient | null>(null);
+  const [recordingClient, setRecordingClient] = useState<RecordingClient | null>(null);
+  const [commandClient, setCommandClient] = useState<CommandChannelClient | null>(null);
+  const [isSupportGalleryView, setIsSupportGalleryView] = useState<boolean>(true);
+  const zmClient = useContext(ZoomContext);
+  const webEndpoint = "zoom.us";
+  const mediaContext = useMemo(() => ({ ...mediaState, mediaStream }), [mediaState, mediaStream]);
+  const galleryViewWithoutSAB = enforceGalleryView === true && !window.crossOriginIsolated;
+
+  useEffect(() => {
+    const init = async () => {
+      await zmClient.init("en-US", `Global`, {
+        webEndpoint,
+        enforceMultipleVideos: galleryViewWithoutSAB,
+      });
+      try {
+        setLoadingText("Joining the session...");
+        await zmClient.join(topic, signature, name, password);
+        const stream = zmClient.getMediaStream();
+        setMediaStream(stream);
+        setIsSupportGalleryView(stream.isSupportMultipleVideos() && !isAndroidBrowser());
+        const chatClient = zmClient.getChatClient();
+        const commandClient = zmClient.getCommandClient();
+        const recordingClient = zmClient.getRecordingClient();
+        setChatClient(chatClient);
+        setCommandClient(commandClient);
+        setRecordingClient(recordingClient);
+        setIsLoading(false);
+      } catch (e: any) {
+        console.info("Error joining meeting", e);
+        setIsLoading(false);
+        message.error(e.reason);
+      }
+    };
+    init();
+    return () => {
+      ZoomVideo.destroyClient();
+    };
+  }, [signature, zmClient, topic, name, password, webEndpoint, galleryViewWithoutSAB]);
+
+  const onConnectionChange = useCallback(
+    (payload: Parameters<typeof event_connection_change>[0]) => {
+      if (payload.state === ConnectionState.Reconnecting) {
+        setIsLoading(true);
+        setIsFailover(true);
+        setStatus("connecting");
+        const { reason } = payload;
+        if (reason === "failover") {
+          setLoadingText("Session Disconnected,Try to reconnect");
+        }
+      } else if (payload.state === ConnectionState.Connected) {
+        setStatus("connected");
+        if (isFailover) {
+          setIsLoading(false);
+        }
+      } else {
+        setStatus("closed");
+        dispatch({ type: "reset-media" });
+        if (payload.reason === "ended by host") {
+          Modal.warning({
+            title: "Meeting ended",
+            content: "This meeting has been ended by host",
+          });
+        }
+      }
+    },
+    [isFailover],
+  );
+
+  const onMediaSDKChange = useCallback((payload: Parameters<typeof event_media_sdk_change>[0]) => {
+    const { action, type, result } = payload;
+    dispatch({ type: `${type}-${action}`, payload: result === "success" });
+  }, []);
+
+  const onDialoutChange = useCallback((payload: Parameters<typeof event_dial_out_change>[0]) => {
+    console.info("onDialoutChange", payload);
+  }, []);
+
+  const onLeaveOrJoinSession = useCallback(async () => {
+    if (status === "closed") {
+      setIsLoading(true);
+      await zmClient.join(topic, signature, name, password);
+      setIsLoading(false);
+    } else if (status === "connected") {
+      await zmClient.leave();
+      message.warn("You have left the session.");
+    }
+  }, [zmClient, status, topic, signature, name, password]);
+
+  useEffect(() => {
+    zmClient.on("connection-change", onConnectionChange);
+    zmClient.on("media-sdk-change", onMediaSDKChange);
+    zmClient.on("dialout-state-change", onDialoutChange);
+
+    return () => {
+      zmClient.off("connection-change", onConnectionChange);
+      zmClient.off("media-sdk-change", onMediaSDKChange);
+      zmClient.off("dialout-state-change", onDialoutChange);
+    };
+  }, [zmClient, onConnectionChange, onMediaSDKChange, onDialoutChange]);
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Generated by create next app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+    <div className="App">
+      {loading && <LoadingLayer content={loadingText} />}
+      {!loading && (
+        <ZoomMediaContext.Provider value={mediaContext}>
+          <ChatContext.Provider value={chatClient}>
+            <RecordingContext.Provider value={recordingClient}>
+              <CommandContext.Provider value={commandClient}>
+                {selectedCard === "home" && (
+                  <Home status={status} onLeaveOrJoinSession={onLeaveOrJoinSession} onCardClick={setSelectedCard} />
+                )}
+                {selectedCard === "preview" && <Preview />}
+                {selectedCard === "video" &&
+                  (isSupportGalleryView ? <Video /> : galleryViewWithoutSAB ? <VideoNonSAB /> : <VideoSingle />)}
+                {selectedCard === "chat" && <Chat />}
+                {selectedCard === "command" && <Command />}
+              </CommandContext.Provider>
+            </RecordingContext.Provider>
+          </ChatContext.Provider>
+        </ZoomMediaContext.Provider>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Index;

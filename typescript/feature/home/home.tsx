@@ -1,103 +1,97 @@
-/* eslint-disable no-restricted-globals */
-import React from 'react';
-import './home.scss';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { Button, Card } from "antd";
 
+import { IconFont, IconType } from "../../component/icon-font";
 
-import Background from 'images/background.png'
-
-
-import Header from 'images/header.png'
-
-
-import App_Img from 'images/app-image.png'
-
-
+const { Meta } = Card;
 interface HomeProps {
   status: string;
+  onLeaveOrJoinSession: () => void;
+  onCardClick: (type: string) => void;
 }
-
 const Home: React.FunctionComponent<HomeProps> = (props) => {
-  const router = useRouter();
-  const { status } = props;
-  const onCardClick = (type: string) => {
-    router.push(`/${type}${location.search}`);
-  };
-  const featureList = [
+  const { status, onLeaveOrJoinSession, onCardClick } = props;
+
+  const featureList: {
+    key: string;
+    icon: IconType;
+    title: string;
+    description: string;
+  }[] = [
     {
-      key: 'video',
-      icon: 'fas fa-video',
-      title: 'Start a Meeting',
-      description:
-        'Gallery Layout, Start/Stop Audio, Mute/Unmute, Start/Stop Video, Start/Stop Screen Share',
+      key: "video",
+      icon: "icon-meeting",
+      title: "Audio, video and share",
+      description: "Gallery Layout, Start/Stop Audio, Mute/Unmute, Start/Stop Video, Start/Stop Screen Share",
     },
-
-  {
-    key: 'chat',
-    icon: 'fas fa-comment-alt',
-    title: 'Start a chat',
-    description: 'Session Chat, Chat Priviledge',
-  },
-
+    {
+      key: "chat",
+      icon: "icon-chat",
+      title: "Session chat",
+      description: "Session Chat, Chat Priviledge",
+    },
+    {
+      key: "command",
+      icon: "icon-chat",
+      title: "Command Channel chat",
+      description: "Session Command Channel chat",
+    },
+    {
+      key: "preview",
+      icon: "icon-meeting",
+      title: "Local Preview",
+      description: "Audio and Video preview",
+    },
   ];
-let actionText;
-if (status === "connected") {
-  actionText = "Leave";
-} else if (status === "closed") {
-  actionText = "Join";
-}
-return (
-    <div
-      className="main"
-
-  style={ { backgroundImage: `url(${Background})` } }
-
-      >
-      <div className="topnav">
-        <Link href="/">
-        <a  className="" id="logo">
-
-            <img className="Logo-Img" src={Header.src} alt="Header"/>
-
+  let actionText: string | null = null;
+  if (status === "connected") {
+    actionText = "Leave";
+  } else if (status === "closed") {
+    actionText = "Join";
+  }
+  return (
+    <div>
+      <div className="nav">
+        <a href="/" className="navhome">
+          <img src="./logo.svg" alt="Home" />
+          <span>VideoSDK Demo</span>
         </a>
-        </Link>
-        <div className="links">
+        <div className="navdoc">
+          <a href="https://marketplace.zoom.us/docs/sdk/video/web/reference" target="_blank" rel="noreferrer">
+            <span>API Reference</span>
+          </a>
 
+          <a href="https://marketplace.zoom.us/docs/sdk/video/web/build/sample-app" target="_blank" rel="noreferrer">
+            <span>Doc</span>
+          </a>
         </div>
+        {actionText !== null && (
+          <Button type="link" className="navleave" onClick={onLeaveOrJoinSession}>
+            {actionText}
+          </Button>
+        )}
       </div>
 
-      <div className="Home-Content-Container">
-
-        <img id="logo" src={App_Img.src} alt="App_Img" />
-
-        <div className="home">
-          <h1>My Video SDK Project</h1>
-          <div className="description">
-            <a></a>
-          </div>
-          <div className="feature-entry">
-            {featureList.map((feature) => {
-            const { key, icon, title } = feature;
-
-              return (
-                <div key={key}>
-                  <button
-                    onClick={() => onCardClick(key)}
-
-                  >
-                    <div className={ "button-contents"}>
-                      <i className={icon}></i>
-                      <span>{title}</span>
-                    </div>
-                  </button>
-                </div>
+      <div className="home">
+        <h1>Zoom Video SDK feature</h1>
+        <div className="feature-entry">
+          {featureList.map((feature) => {
+            const { key, icon, title, description } = feature;
+            return (
+              <Card
+                cover={<IconFont style={{ fontSize: "72px" }} type={icon} />}
+                hoverable
+                style={{ width: 320 }}
+                className="entry-item"
+                key={key}
+                onClick={() => onCardClick(key)}
+              >
+                <Meta title={title} description={description} />
+              </Card>
             );
           })}
-          </div>
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 export default Home;
