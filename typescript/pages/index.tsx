@@ -88,7 +88,7 @@ const Home: NextPage<AppProps> = (props) => {
 
   useEffect(() => {
     const init = async () => {
-      await zmClient.init("en-US", `${window.location.origin}/lib`, 'zoom.us');
+      await zmClient.init("en-US", `Global`);
       try {
         setLoadingText("Joining the session...");
         await zmClient.join(topic, signature, name, password);
