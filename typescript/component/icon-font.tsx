@@ -1,29 +1,29 @@
 import Icon from "@ant-design/icons";
 
-import { ReactComponent as IconAdvanced } from "./svgs/icon-advanced.svg";
-import { ReactComponent as IconChat } from "./svgs/icon-chat.svg";
-import { ReactComponent as IconGroup } from "./svgs/icon-group.svg";
-import { ReactComponent as IconHeadset } from "./svgs/icon-headset.svg";
-import { ReactComponent as IconMeeting } from "./svgs/icon-meeting.svg";
-import { ReactComponent as IconPause } from "./svgs/icon-pause.svg";
-import { ReactComponent as IconPhoneOff } from "./svgs/icon-phone-off.svg";
-import { ReactComponent as IconPhone } from "./svgs/icon-phone.svg";
-import { ReactComponent as IconRecordingAnimatedHovered } from "./svgs/icon-recording-animated-hovered.svg";
-import { ReactComponent as IconRecordingAnimated } from "./svgs/icon-recording-animated.svg";
-import { ReactComponent as IconRecording } from "./svgs/icon-recording-default.svg";
-import { ReactComponent as IconRecordingHovered } from "./svgs/icon-recording-hovered.svg";
-import { ReactComponent as IconRecordingPauseHovered } from "./svgs/icon-recording-pause-hovered.svg";
-import { ReactComponent as IconRecordingPause } from "./svgs/icon-recording-pause.svg";
-import { ReactComponent as IconRecordingResumeHovered } from "./svgs/icon-recording-resume-hovered.svg";
-import { ReactComponent as IconRecordingResume } from "./svgs/icon-recording-resume.svg";
-import { ReactComponent as IconRecordingStopHovered } from "./svgs/icon-recording-stop-hovered.svg";
-import { ReactComponent as IconRecordingStop } from "./svgs/icon-recording-stop.svg";
-import { ReactComponent as IconRemoteControl } from "./svgs/icon-remote-control.svg";
-import { ReactComponent as IconResume } from "./svgs/icon-resume.svg";
-import { ReactComponent as IconShare } from "./svgs/icon-share.svg";
-import { ReactComponent as IconSpotlight } from "./svgs/icon-spotlight.svg";
-import { ReactComponent as IconStart } from "./svgs/icon-start.svg";
-import { ReactComponent as IconStop } from "./svgs/icon-stop.svg";
+import IconAdvanced from "./svgs/icon-advanced.svg";
+import IconChat from "./svgs/icon-chat.svg";
+import IconGroup from "./svgs/icon-group.svg";
+import IconHeadset from "./svgs/icon-headset.svg";
+import IconMeeting from "./svgs/icon-meeting.svg";
+import IconPause from "./svgs/icon-pause.svg";
+import IconPhoneOff from "./svgs/icon-phone-off.svg";
+import IconPhone from "./svgs/icon-phone.svg";
+import IconRecordingAnimatedHovered from "./svgs/icon-recording-animated-hovered.svg";
+import IconRecordingAnimated from "./svgs/icon-recording-animated.svg";
+import IconRecording from "./svgs/icon-recording-default.svg";
+import IconRecordingHovered from "./svgs/icon-recording-hovered.svg";
+import IconRecordingPauseHovered from "./svgs/icon-recording-pause-hovered.svg";
+import IconRecordingPause from "./svgs/icon-recording-pause.svg";
+import IconRecordingResumeHovered from "./svgs/icon-recording-resume-hovered.svg";
+import IconRecordingResume from "./svgs/icon-recording-resume.svg";
+import IconRecordingStopHovered from "./svgs/icon-recording-stop-hovered.svg";
+import IconRecordingStop from "./svgs/icon-recording-stop.svg";
+import IconRemoteControl from "./svgs/icon-remote-control.svg";
+import IconResume from "./svgs/icon-resume.svg";
+import IconShare from "./svgs/icon-share.svg";
+import IconSpotlight from "./svgs/icon-spotlight.svg";
+import IconStart from "./svgs/icon-start.svg";
+import IconStop from "./svgs/icon-stop.svg";
 
 const iconComponentMap = {
   "icon-advanced": IconAdvanced,
