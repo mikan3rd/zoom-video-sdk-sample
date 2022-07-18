@@ -1,31 +1,41 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
-import React, {
-  useEffect,
-  useContext,
-  useState,
-  useCallback,
-  useReducer,
-} from "react";
-import ZoomVideo, { ConnectionState, event_connection_change, event_media_sdk_change } from "@zoom/videosdk";
-import { message, Modal } from "antd";
+import ZoomVideo, {
+  ConnectionState,
+  event_connection_change,
+  event_dial_out_change,
+  event_media_sdk_change,
+} from "@zoom/videosdk";
+import { Modal, message } from "antd";
+import { produce } from "immer";
+import type { NextPage } from "next";
+
+import LoadingLayer from "../component/loading-layer";
+import ChatContext from "../context/chat-context";
+import CommandContext from "../context/cmd-context";
+import ZoomMediaContext from "../context/media-context";
+import RecordingContext from "../context/recording-context";
 import ZoomContext from "../context/zoom-context";
-import { ChatClient, MediaStream } from "../types/index-types";
-import produce from "immer";
+import Chat from "../feature/chat/chat";
+import Command from "../feature/command/command";
+import Home from "../feature/home/home";
+import Preview from "../feature/preview/preview";
+import Video from "../feature/video/video";
+import VideoNonSAB from "../feature/video/video-non-sab";
+import VideoSingle from "../feature/video/video-single";
+import { ChatClient, CommandChannelClient, MediaStream, RecordingClient } from "../types/index-types.d";
+import { isAndroidBrowser } from "../utils/platform";
+
 import "../styles/App.css";
 
-interface AppProps {
-  meetingArgs: {
-    sdkKey: string;
-    topic: string;
-    signature: string;
-    name: string;
-    password?: string;
-  };
-}
+type AppProps = {
+  topic: string;
+  signature: string;
+  name: string;
+  password?: string;
+  enforceGalleryView?: boolean;
+};
+
 const mediaShape = {
   audio: {
     encode: false,
@@ -40,6 +50,7 @@ const mediaShape = {
     decode: false,
   },
 };
+
 const mediaReducer = produce((draft, action) => {
   switch (action.type) {
     case "audio-encode": {
@@ -66,16 +77,18 @@ const mediaReducer = produce((draft, action) => {
       draft.share.decode = action.payload;
       break;
     }
+    case "reset-media": {
+      Object.assign(draft, { ...mediaShape });
+      break;
+    }
+
     default:
       break;
   }
 }, mediaShape);
 
-const Home: NextPage<AppProps> = (props) => {
-
-  const {
-    meetingArgs: { sdkKey, topic, signature, name, password },
-  } = props;
+const Index: NextPage<AppProps> = (props) => {
+  const { topic, signature, name, password, enforceGalleryView } = props;
   const [loading, setIsLoading] = useState(true);
   const [loadingText, setLoadingText] = useState("");
   const [isFailover, setIsFailover] = useState<boolean>(false);
@@ -83,22 +96,35 @@ const Home: NextPage<AppProps> = (props) => {
   const [mediaState, dispatch] = useReducer(mediaReducer, mediaShape);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [chatClient, setChatClient] = useState<ChatClient | null>(null);
+  const [recordingClient, setRecordingClient] = useState<RecordingClient | null>(null);
+  const [commandClient, setCommandClient] = useState<CommandChannelClient | null>(null);
   const [isSupportGalleryView, setIsSupportGalleryView] = useState<boolean>(true);
   const zmClient = useContext(ZoomContext);
+  const webEndpoint = "zoom.us";
+  const mediaContext = useMemo(() => ({ ...mediaState, mediaStream }), [mediaState, mediaStream]);
+  const galleryViewWithoutSAB = enforceGalleryView === true && !window.crossOriginIsolated;
 
   useEffect(() => {
     const init = async () => {
-      await zmClient.init("en-US", `Global`);
+      await zmClient.init("en-US", `Global`, {
+        webEndpoint,
+        enforceMultipleVideos: galleryViewWithoutSAB,
+      });
       try {
         setLoadingText("Joining the session...");
         await zmClient.join(topic, signature, name, password);
         const stream = zmClient.getMediaStream();
         setMediaStream(stream);
-	      setIsSupportGalleryView(stream.isSupportMultipleVideos());
+        setIsSupportGalleryView(stream.isSupportMultipleVideos() && !isAndroidBrowser());
         const chatClient = zmClient.getChatClient();
+        const commandClient = zmClient.getCommandClient();
+        const recordingClient = zmClient.getRecordingClient();
         setChatClient(chatClient);
+        setCommandClient(commandClient);
+        setRecordingClient(recordingClient);
         setIsLoading(false);
       } catch (e: any) {
+        console.info("Error joining meeting", e);
         setIsLoading(false);
         message.error(e.reason);
       }
@@ -107,7 +133,7 @@ const Home: NextPage<AppProps> = (props) => {
     return () => {
       ZoomVideo.destroyClient();
     };
-  }, [sdkKey, signature, zmClient, topic, name, password]);
+  }, [signature, zmClient, topic, name, password, webEndpoint, galleryViewWithoutSAB]);
   const onConnectionChange = useCallback(
     (payload: Parameters<typeof event_connection_change>[0]) => {
       if (payload.state === ConnectionState.Reconnecting) {
@@ -123,8 +149,9 @@ const Home: NextPage<AppProps> = (props) => {
         if (isFailover) {
           setIsLoading(false);
         }
-      } else if (payload.state === ConnectionState.Closed) {
+      } else {
         setStatus("closed");
+        dispatch({ type: "reset-media" });
         if (payload.reason === "ended by host") {
           Modal.warning({
             title: "Meeting ended",
@@ -133,12 +160,17 @@ const Home: NextPage<AppProps> = (props) => {
         }
       }
     },
-    [isFailover]
+    [isFailover],
   );
   const onMediaSDKChange = useCallback((payload: Parameters<typeof event_media_sdk_change>[0]) => {
     const { action, type, result } = payload;
     dispatch({ type: `${type}-${action}`, payload: result === "success" });
   }, []);
+
+  const onDialoutChange = useCallback((payload: Parameters<typeof event_dial_out_change>[0]) => {
+    console.info("onDialoutChange", payload);
+  }, []);
+
   const onLeaveOrJoinSession = useCallback(async () => {
     if (status === "closed") {
       setIsLoading(true);
@@ -152,15 +184,16 @@ const Home: NextPage<AppProps> = (props) => {
   useEffect(() => {
     zmClient.on("connection-change", onConnectionChange);
     zmClient.on("media-sdk-change", onMediaSDKChange);
+    zmClient.on("dialout-state-change", onDialoutChange);
+
     return () => {
       zmClient.off("connection-change", onConnectionChange);
       zmClient.off("media-sdk-change", onMediaSDKChange);
+      zmClient.off("dialout-state-change", onDialoutChange);
     };
-  }, [zmClient, onConnectionChange, onMediaSDKChange]);
+  }, [zmClient, onConnectionChange, onMediaSDKChange, onDialoutChange]);
 
-  return (
-    <div>TEST</div>
-  )
-}
+  return <div>TEST</div>;
+};
 
-export default Home
+export default Index;
