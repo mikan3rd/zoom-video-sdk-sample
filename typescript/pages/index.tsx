@@ -26,8 +26,6 @@ import VideoSingle from "../feature/video/video-single";
 import { ChatClient, CommandChannelClient, MediaStream, RecordingClient } from "../types/index-types.d";
 import { isAndroidBrowser } from "../utils/platform";
 
-import "../styles/App.css";
-
 type AppProps = {
   topic: string;
   signature: string;
@@ -89,6 +87,8 @@ const mediaReducer = produce((draft, action) => {
 
 const Index: NextPage<AppProps> = (props) => {
   const { topic, signature, name, password, enforceGalleryView } = props;
+
+  const [selectedCard, setSelectedCard] = useState<string>("home");
   const [loading, setIsLoading] = useState(true);
   const [loadingText, setLoadingText] = useState("");
   const [isFailover, setIsFailover] = useState<boolean>(false);
@@ -134,6 +134,7 @@ const Index: NextPage<AppProps> = (props) => {
       ZoomVideo.destroyClient();
     };
   }, [signature, zmClient, topic, name, password, webEndpoint, galleryViewWithoutSAB]);
+
   const onConnectionChange = useCallback(
     (payload: Parameters<typeof event_connection_change>[0]) => {
       if (payload.state === ConnectionState.Reconnecting) {
@@ -162,6 +163,7 @@ const Index: NextPage<AppProps> = (props) => {
     },
     [isFailover],
   );
+
   const onMediaSDKChange = useCallback((payload: Parameters<typeof event_media_sdk_change>[0]) => {
     const { action, type, result } = payload;
     dispatch({ type: `${type}-${action}`, payload: result === "success" });
@@ -181,6 +183,7 @@ const Index: NextPage<AppProps> = (props) => {
       message.warn("You have left the session.");
     }
   }, [zmClient, status, topic, signature, name, password]);
+
   useEffect(() => {
     zmClient.on("connection-change", onConnectionChange);
     zmClient.on("media-sdk-change", onMediaSDKChange);
@@ -193,7 +196,29 @@ const Index: NextPage<AppProps> = (props) => {
     };
   }, [zmClient, onConnectionChange, onMediaSDKChange, onDialoutChange]);
 
-  return <div>TEST</div>;
+  return (
+    <div className="App">
+      {loading && <LoadingLayer content={loadingText} />}
+      {!loading && (
+        <ZoomMediaContext.Provider value={mediaContext}>
+          <ChatContext.Provider value={chatClient}>
+            <RecordingContext.Provider value={recordingClient}>
+              <CommandContext.Provider value={commandClient}>
+                {selectedCard === "home" && (
+                  <Home status={status} onLeaveOrJoinSession={onLeaveOrJoinSession} onCardClick={setSelectedCard} />
+                )}
+                {selectedCard === "preview" && <Preview />}
+                {selectedCard === "video" &&
+                  (isSupportGalleryView ? <Video /> : galleryViewWithoutSAB ? <VideoNonSAB /> : <VideoSingle />)}
+                {selectedCard === "chat" && <Chat />}
+                {selectedCard === "command" && <Command />}
+              </CommandContext.Provider>
+            </RecordingContext.Provider>
+          </ChatContext.Provider>
+        </ZoomMediaContext.Provider>
+      )}
+    </div>
+  );
 };
 
 export default Index;

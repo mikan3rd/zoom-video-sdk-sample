@@ -1,21 +1,16 @@
 import { Button, Card } from "antd";
-import { useRouter } from "next/router";
 
 import { IconFont, IconType } from "../../component/icon-font";
-
-import "./home.scss";
 
 const { Meta } = Card;
 interface HomeProps {
   status: string;
   onLeaveOrJoinSession: () => void;
+  onCardClick: (type: string) => void;
 }
 const Home: React.FunctionComponent<HomeProps> = (props) => {
-  const router = useRouter();
-  const { status, onLeaveOrJoinSession } = props;
-  const onCardClick = (type: string) => {
-    router.push(`/${type}${location.search}`);
-  };
+  const { status, onLeaveOrJoinSession, onCardClick } = props;
+
   const featureList: {
     key: string;
     icon: IconType;

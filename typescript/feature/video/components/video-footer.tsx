@@ -31,8 +31,6 @@ import MicrophoneButton from "./microphone";
 import { RecordButtonProps, RecordingButton, getRecordingButtons } from "./recording";
 import { ScreenShareButton } from "./screen-share";
 
-import "./video-footer.scss";
-
 interface VideoFooterProps {
   className?: string;
   shareRef?: MutableRefObject<HTMLCanvasElement | null>;

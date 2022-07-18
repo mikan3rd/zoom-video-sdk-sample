@@ -4,7 +4,6 @@ import ZoomVideo from "@zoom/videosdk";
 import { message } from "antd";
 
 import { useMount } from "../../hooks";
-import "./preview.scss";
 import CameraButton from "../video/components/camera";
 import MicrophoneButton from "../video/components/microphone";
 import { MediaDevice } from "../video/video-types.d";

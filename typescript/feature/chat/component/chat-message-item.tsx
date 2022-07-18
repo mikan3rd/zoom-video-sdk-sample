@@ -5,7 +5,7 @@ import { Button } from "antd";
 import classNames from "classnames";
 
 import { ChatRecord } from "../chat-types.d";
-import "./chat-message-item.scss";
+
 interface ChatMessageItemProps {
   record: ChatRecord;
   currentUserId: number;

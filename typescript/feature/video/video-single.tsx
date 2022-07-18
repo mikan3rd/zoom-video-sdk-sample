@@ -18,8 +18,6 @@ import { useParticipantsChange } from "./hooks/useParticipantsChange";
 import { useShare } from "./hooks/useShare";
 import { SELF_VIDEO_ID } from "./video-constants";
 
-import "./video.scss";
-
 const isUseVideoElementToDrawSelfVideo = isAndroidBrowser() || isSupportOffscreenCanvas();
 
 const VideoContainer: React.FunctionComponent = (props) => {

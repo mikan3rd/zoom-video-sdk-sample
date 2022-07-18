@@ -18,8 +18,6 @@ import { useGalleryLayout } from "./hooks/useGalleryLayout";
 import { usePagination } from "./hooks/usePagination";
 import { useShare } from "./hooks/useShare";
 
-import "./video.scss";
-
 const VideoContainer: React.FunctionComponent = (props) => {
   const zmClient = useContext(ZoomContext);
   const {

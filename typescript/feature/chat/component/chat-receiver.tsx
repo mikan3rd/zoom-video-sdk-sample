@@ -7,7 +7,7 @@ import classNames from "classnames";
 
 import ChatContext from "../../../context/chat-context";
 import { ChatReceiver } from "../chat-types.d";
-import "./chat-receiver.scss";
+
 const { Item: MenuItem, ItemGroup: MenuItemGroup } = Menu;
 interface ChatReceiverProps {
   chatUsers: ChatReceiver[];

@@ -4,8 +4,6 @@ import classNames from "classnames";
 
 import { MediaDevice } from "../video-types.d";
 
-import "./camera.scss";
-
 interface CameraButtonProps {
   isStartedVideo: boolean;
   isMirrored?: boolean;

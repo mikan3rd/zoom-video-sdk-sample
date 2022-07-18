@@ -3,7 +3,7 @@ import { Button, Tooltip } from "antd";
 import classNames from "classnames";
 
 import { IconFont } from "../../../component/icon-font";
-import "./screen-share.scss";
+
 interface ScreenShareButtonProps {
   isStartedScreenShare: boolean;
   onScreenShareClick: () => void;

@@ -1,9 +1,5 @@
 // eslint-disable-next-line import/prefer-default-export
 export function getExploreName() {
-  if (!window) {
-    return "";
-  }
-
   const { userAgent } = navigator;
   if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
     return "Opera";

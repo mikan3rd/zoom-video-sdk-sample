@@ -6,7 +6,28 @@ import ZoomContext from "../context/zoom-context";
 import { generateVideoToken } from "../utils/util";
 
 import "antd/dist/antd.css";
+
 import "../styles/globals.css";
+import "../styles/App.css";
+
+import "../styles/loading-layer.scss";
+import "../styles/chat.scss";
+import "../styles/chat-message-item.scss";
+import "../styles/chat-receiver.scss";
+import "../styles/command.scss";
+import "../styles/cmd-message-item.scss";
+import "../styles/cmd-receiver.scss";
+import "../styles/home.scss";
+import "../styles/preview.scss";
+import "../styles/video.scss";
+import "../styles/avatar.scss";
+import "../styles/call-out-model.scss";
+import "../styles/camera.scss";
+import "../styles/microphone.scss";
+import "../styles/pagination.scss";
+import "../styles/recording.scss";
+import "../styles/screen-share.scss";
+import "../styles/video-footer.scss";
 
 type MeegingArgsType = {
   topic: string;

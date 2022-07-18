@@ -13,8 +13,6 @@ import ChatMessageItem from "./component/cmd-message-item";
 import CommandReceiverContainer from "./component/cmd-receiver";
 import { useParticipantsChange } from "./hooks/useParticipantsChange";
 
-import "./command.scss";
-
 const { TextArea } = Input;
 
 const oneToAllUser = {

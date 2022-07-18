@@ -5,7 +5,7 @@ import { Button, Dropdown, Menu } from "antd";
 import classNames from "classnames";
 
 import { CommandReceiver } from "../cmd-types.d";
-import "./cmd-receiver.scss";
+
 const { Item: MenuItem } = Menu;
 
 interface CommandReceiverProps {

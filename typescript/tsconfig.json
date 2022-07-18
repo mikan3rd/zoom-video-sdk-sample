@@ -11,8 +11,8 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    // "noUnusedLocals": true, // TODO
-    // "noUncheckedIndexedAccess": true, // TODO
+    "noUnusedLocals": true,
+    "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",

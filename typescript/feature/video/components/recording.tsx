@@ -5,7 +5,6 @@ import { Button, Tooltip } from "antd";
 import classNames from "classnames";
 
 import { IconFont, IconType } from "../../../component/icon-font";
-import "./recording.scss";
 
 export interface RecordButtonProps {
   text: string;

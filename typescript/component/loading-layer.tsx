@@ -1,5 +1,4 @@
 import { LoadingOutlined } from "@ant-design/icons";
-import "./loading-layer.scss";
 
 const LoadingLayer = (props: { content: string }) => {
   const { content } = props;

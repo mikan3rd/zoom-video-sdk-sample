@@ -1,8 +1,6 @@
 import { Checkbox, Form, Input, Modal, Select } from "antd";
 import classNames from "classnames";
 
-import "./call-out-model.scss";
-
 interface CallOutModelProps {
   visible: boolean;
   phoneCountryList?: any[];
