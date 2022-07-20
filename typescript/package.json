@@ -17,7 +17,7 @@
     "@svgr/webpack": "^6.2.1",
     "@types/classnames": "^2.2.11",
     "@types/crypto-js": "^4.0.1",
-    "@types/jsrsasign": "^8.0.10",
+    "@types/jsrsasign": "10.5.2",
     "@types/lodash": "^4.14.168",
     "@types/node": "18.0.3",
     "@types/react": "18.0.15",
